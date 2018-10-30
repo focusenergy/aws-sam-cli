@@ -47,16 +47,17 @@ def cli(ctx,
 
         # Common Options for Lambda Invoke
         template, env_vars, debug_port, debug_args, debugger_path, docker_volume_basedir,
-        docker_network, log_file, skip_pull_image, profile, region, parameter_overrides
+        docker_network, log_file, skip_pull_image, profile, region, parameter_overrides,
+        authorizer_data
         ):
     # All logic must be implemented in the ``do_cli`` method. This helps with easy unit testing
 
-    do_cli(ctx, host, port, static_dir, template, env_vars, debug_port, debug_args, debugger_path,
+    do_cli(ctx, host, port, static_dir, template, env_vars, authorizer_data, debug_port, debug_args, debugger_path,
            docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region,
            parameter_overrides)  # pragma: no cover
 
 
-def do_cli(ctx, host, port, static_dir, template, env_vars, debug_port, debug_args,  # pylint: disable=R0914
+def do_cli(ctx, host, port, static_dir, template, env_vars, authorizer_data, debug_port, debug_args,  # pylint: disable=R0914
            debugger_path, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region,
            parameter_overrides):
     """
@@ -64,7 +65,6 @@ def do_cli(ctx, host, port, static_dir, template, env_vars, debug_port, debug_ar
     """
 
     LOG.debug("local start-api command is called")
-
     # Pass all inputs to setup necessary context to invoke function locally.
     # Handler exception raised by the processor for invalid args and print errors
 
@@ -72,6 +72,7 @@ def do_cli(ctx, host, port, static_dir, template, env_vars, debug_port, debug_ar
         with InvokeContext(template_file=template,
                            function_identifier=None,  # Don't scope to one particular function
                            env_vars_file=env_vars,
+                           authorizer_data_file=authorizer_data,
                            docker_volume_basedir=docker_volume_basedir,
                            docker_network=docker_network,
                            log_file=log_file,

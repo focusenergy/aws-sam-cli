@@ -148,6 +148,9 @@ def invoke_common_options(f):
         click.option('--region',
                      help="Specify which AWS region to use."),
 
+        click.option('--authorizer-data', '-a',
+                     type=click.Path(exists=True),
+                     help="JSON file containing values for proxy request authorizer data"),
     ]
 
     # Reverse the list to maintain ordering of options in help text printed with --help

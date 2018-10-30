@@ -36,7 +36,7 @@ class LocalApigwService(BaseLocalService):
     _DEFAULT_PORT = 3000
     _DEFAULT_HOST = '127.0.0.1'
 
-    def __init__(self, routing_list, lambda_runner, static_dir=None, port=None, host=None, stderr=None):
+    def __init__(self, routing_list, lambda_runner, static_dir=None, port=None, host=None, stderr=None, authorizer_data=None):
         """
         Creates an ApiGatewayService
 
@@ -57,6 +57,9 @@ class LocalApigwService(BaseLocalService):
         self.static_dir = static_dir
         self._dict_of_routes = {}
         self.stderr = stderr
+        print("Using authorizer data")
+        print(authorizer_data)
+        self.authorizer_data = authorizer_data
 
     def create(self):
         """
@@ -130,7 +133,7 @@ class LocalApigwService(BaseLocalService):
         route = self._get_current_route(request)
 
         try:
-            event = self._construct_event(request, self.port, route.binary_types)
+            event = self._construct_event(request, self.port, route.binary_types, self.authorizer_data)
         except UnicodeDecodeError:
             return ServiceErrorResponses.lambda_failure_response()
 
@@ -240,7 +243,7 @@ class LocalApigwService(BaseLocalService):
         return best_match_mimetype and is_best_match_in_binary_types and is_base_64_encoded
 
     @staticmethod
-    def _construct_event(flask_request, port, binary_types):
+    def _construct_event(flask_request, port, binary_types, authorizer_data):
         """
         Helper method that constructs the Event to be passed to Lambda
 
@@ -271,7 +274,8 @@ class LocalApigwService(BaseLocalService):
                                  http_method=method,
                                  stage="prod",
                                  identity=identity,
-                                 path=endpoint)
+                                 path=endpoint,
+                                 authorizer=authorizer_data)
 
         event_headers = dict(flask_request.headers)
         event_headers["X-Forwarded-Proto"] = flask_request.scheme

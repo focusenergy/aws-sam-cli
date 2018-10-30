@@ -72,7 +72,8 @@ class RequestContext(object):
                  stage=None,
                  identity=None,
                  extended_request_id=None,
-                 path=None):
+                 path=None,
+                 authorizer=None):
         """
         Constructs a RequestContext
 
@@ -98,6 +99,7 @@ class RequestContext(object):
         self.identity = identity
         self.extended_request_id = extended_request_id
         self.path = path
+        self.authorizer = authorizer
 
     def to_dict(self):
         """
@@ -118,7 +120,8 @@ class RequestContext(object):
                      "stage": self.stage,
                      "identity": identity_dict,
                      "extendedRequestId": self.extended_request_id,
-                     "path": self.path
+                     "path": self.path,
+                     "authorizer": self.authorizer
                      }
 
         return json_dict

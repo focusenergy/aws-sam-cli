@@ -43,6 +43,7 @@ class LocalApiService(object):
                                            cwd=self.cwd)
         self.lambda_runner = lambda_invoke_context.local_lambda_runner
         self.stderr_stream = lambda_invoke_context.stderr
+        self.authorizer_data_values = lambda_invoke_context.authorizer_data
 
     def start(self):
         """
@@ -69,7 +70,8 @@ class LocalApiService(object):
                                     static_dir=static_dir_path,
                                     port=self.port,
                                     host=self.host,
-                                    stderr=self.stderr_stream)
+                                    stderr=self.stderr_stream,
+                                    authorizer_data=self.authorizer_data_values)
 
         service.create()
 

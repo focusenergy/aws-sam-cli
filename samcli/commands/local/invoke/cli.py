@@ -44,16 +44,16 @@ STDIN_FILE_NAME = "-"
 @pass_context  # pylint: disable=R0914
 def cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,
         debug_args, debugger_path, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region,
-        parameter_overrides):
+        parameter_overrides, authorizer_data):
 
     # All logic must be implemented in the ``do_cli`` method. This helps with easy unit testing
 
-    do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port, debug_args, debugger_path,
+    do_cli(ctx, function_identifier, template, event, no_event, env_vars, authorizer_data, debug_port, debug_args, debugger_path,
            docker_volume_basedir, docker_network, log_file, skip_pull_image, profile, region,
            parameter_overrides)  # pragma: no cover
 
 
-def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_port,  # pylint: disable=R0914
+def do_cli(ctx, function_identifier, template, event, no_event, env_vars, authorizer_data, debug_port,  # pylint: disable=R0914
            debug_args, debugger_path, docker_volume_basedir, docker_network, log_file, skip_pull_image, profile,
            region, parameter_overrides):
     """
@@ -77,6 +77,7 @@ def do_cli(ctx, function_identifier, template, event, no_event, env_vars, debug_
         with InvokeContext(template_file=template,
                            function_identifier=function_identifier,
                            env_vars_file=env_vars,
+                           authorizer_data_file=authorizer_data,
                            docker_volume_basedir=docker_volume_basedir,
                            docker_network=docker_network,
                            log_file=log_file,

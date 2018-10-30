@@ -48,6 +48,7 @@ class InvokeContext(object):
                  template_file,
                  function_identifier=None,
                  env_vars_file=None,
+                 authorizer_data_file=None,
                  docker_volume_basedir=None,
                  docker_network=None,
                  log_file=None,
@@ -69,6 +70,8 @@ class InvokeContext(object):
             Identifier of the function to invoke
         env_vars_file str
             Path to a file containing values for environment variables
+        authorizer_data_file str
+            Path to a file containing the data to be used for authorizer
         docker_volume_basedir str
             Directory for the Docker volume
         docker_network str
@@ -97,6 +100,7 @@ class InvokeContext(object):
         self._template_file = template_file
         self._function_identifier = function_identifier
         self._env_vars_file = env_vars_file
+        self._authorizer_data_file = authorizer_data_file
         self._docker_volume_basedir = docker_volume_basedir
         self._docker_network = docker_network
         self._log_file = log_file
@@ -111,6 +115,7 @@ class InvokeContext(object):
         self._template_dict = None
         self._function_provider = None
         self._env_vars_value = None
+        self._authorizer_data_value = None
         self._log_file_handle = None
         self._debug_context = None
 
@@ -126,6 +131,7 @@ class InvokeContext(object):
         self._function_provider = SamFunctionProvider(self._template_dict, self.parameter_overrides)
 
         self._env_vars_value = self._get_env_vars_value(self._env_vars_file)
+        self._authorizer_data_value = self._get_authorizer_data_value(self._authorizer_data_file)
         self._log_file_handle = self._setup_log_file(self._log_file)
 
         self._debug_context = self._get_debug_context(self._debug_port,
@@ -307,6 +313,34 @@ class InvokeContext(object):
             raise InvokeContextException("Could not read environment variables overrides from file {}: {}".format(
                                          filename,
                                          str(ex)))
+
+    @property
+    def authorizer_data(self):
+        return self._authorizer_data_value
+
+    @staticmethod
+    def _get_authorizer_data_value(filename):
+        """
+        If the user provided a file containing values of environment variables, this method will read the file and
+        return its value
+
+        :param string filename: Path to file containing authorizer values
+        :return dict: Value of authorizer data, if provided. None otherwise
+        :raises InvokeContextException: If the file was not found or not a valid JSON
+        """
+        if not filename:
+            return None
+
+        # Try to read the file and parse it as JSON
+        try:
+
+            with open(filename, 'r') as fp:
+                return json.load(fp)
+
+        except Exception as ex:
+            raise InvokeContextException("Could not read authorizer values from file {}: {}".format(
+                filename,
+                str(ex)))
 
     @staticmethod
     def _setup_log_file(log_file):

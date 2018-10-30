@@ -1,7 +1,7 @@
 """
 Implementation of Local Lambda runner
 """
-
+import json
 import os
 import logging
 import boto3
@@ -29,7 +29,8 @@ class LocalLambdaRunner(object):
                  env_vars_values=None,
                  aws_profile=None,
                  debug_context=None,
-                 aws_region=None):
+                 aws_region=None,
+                 authorizer_data=None):
         """
         Initializes the class
 
@@ -51,6 +52,7 @@ class LocalLambdaRunner(object):
         self.aws_profile = aws_profile
         self.aws_region = aws_region
         self.debug_context = debug_context
+        self.authorizer_data = authorizer_data
 
     def invoke(self, function_name, event, stdout=None, stderr=None):
         """
@@ -65,6 +67,12 @@ class LocalLambdaRunner(object):
         :param io.BaseIO stderr: Stream to write the Lambda runtime logs to.
         :raises FunctionNotfound: When we cannot find a function with the given name
         """
+        print("lambda event")
+        print(event)
+
+        e = json.loads(event)
+        e['authorizer'] = self.authorizer_data
+        event = json.dumps(e)
 
         # Generate the correct configuration based on given inputs
         function = self.provider.get(function_name)
